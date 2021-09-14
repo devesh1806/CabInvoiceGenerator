@@ -3,9 +3,9 @@ package com.cabinvoicegenerator;
 public class InvoiceData {
 	
 	public Double kiloMeters;
-	public Integer time;
+	public Double time;
 	
-	public InvoiceData(Double kiloMeters,Integer time) {
+	public InvoiceData(Double kiloMeters,Double time) {
 		this.kiloMeters = kiloMeters;
 		this.time = time;
 	}
