@@ -1,14 +1,11 @@
 package com.cabinvoicegeneratortest;
 
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
-import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
 import com.cabinvoicegenerator.CalculateInvoice;
 import com.cabinvoicegenerator.InvoiceData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -51,20 +48,35 @@ public class InvoiceTest {
 	@Test
 	public void givenMultipleData_WhenCalculated_ShouldReturnTotalFare() {
 		calculateInvoice = new CalculateInvoice();
-		Double result = calculateInvoice.calculateMultipleRidesFare();
+		List<InvoiceData> arr=calculateInvoice.getList();
+		Double result = calculateInvoice.calculateMultipleRidesFare(arr);
 		Assert.assertEquals((Double)1218.9, result);
 	}
 	
 	@Test
 	public void givenMultipleData_WhenCalculated_ShouldReturnTotalAverageFareAndTotalRides() {
 		calculateInvoice = new CalculateInvoice();
-		Double result = calculateInvoice.calculateMultipleRidesFare();
+		List<InvoiceData> arr=calculateInvoice.getList();
+		Double result = calculateInvoice.calculateMultipleRidesFare(arr);
 		if (result<5.0) result = 5.0;
-		Integer resultCount = calculateInvoice.totalRidesCount();
-		Double resultAvg = calculateInvoice.avgRideFare(result);
+		Integer resultCount = calculateInvoice.totalRidesCount(arr);
+		Double resultAvg = calculateInvoice.avgRideFare(result,arr);
 		Assert.assertEquals((Double)1218.9, result);
 		Assert.assertEquals((Integer)6, resultCount);
-		System.out.println(resultAvg);
 		Assert.assertEquals((Double)203.15, resultAvg);
 	}
+	
+	@Test
+	public void givenDataWithId_WhenCalculated_ShouldReturnInvoice() {
+		calculateInvoice = new CalculateInvoice();
+		List<InvoiceData> arr=calculateInvoice.addToListRidesService();
+		List<InvoiceData> arrSecond=calculateInvoice.getList();
+		calculateInvoice.invoiceReturn(arr,1);
+		calculateInvoice.invoiceReturn(arrSecond,2);
+		String res = calculateInvoice.invoice(1);
+		String resSecond = calculateInvoice.invoice(2);
+		Assert.assertEquals("Total Fare = 875.0,\nAverage Fare = 291.67,\nTotal Rides = 3", res);
+		Assert.assertEquals("Total Fare = 2093.9,\nAverage Fare = 348.98,\nTotal Rides = 6", resSecond);
+	}
+	
 }
