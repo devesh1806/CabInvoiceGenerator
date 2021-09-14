@@ -8,26 +8,39 @@ import java.util.Map;
 public class CalculateInvoice {
 
 	private Double fare = 0.0;
-    private final Integer ratePerKm = 10;
-    private final Integer ratePerMin = 1;
 
 	public static List<InvoiceData> totalRides = new ArrayList<>();
     public static Map<Integer,InvoiceService> invoiceDetails = new HashMap<>();
-	
+	public CarAgency carAgency = new CarAgency();
+    
+    
     public void addToListRides(InvoiceData invoiceData) {
     	totalRides.add(invoiceData);
     }
     
-	public Double calculateTotalFare(InvoiceData invoiceData) {
-		fare += (invoiceData.kiloMeters*ratePerKm) + (invoiceData.time*ratePerMin);
-		return fare;
+	public Double calculateTotalFare(InvoiceData invoiceData,String category) {
+		if (category.equals("normal")) {
+			fare += (invoiceData.kiloMeters*carAgency.normalRatePerKm) + (invoiceData.time*carAgency.normalRatePerMin);
+			return fare;
+		}
+		else {
+			fare += (invoiceData.kiloMeters*carAgency.premiumRatePerKm) + (invoiceData.time*carAgency.premiumRatePerMin);
+			return fare;
+		}
 	}
 
-	public Double calculateMultipleRidesFare(List<InvoiceData> totalRides) {
+	public Double calculateMultipleRidesFare(List<InvoiceData> totalRides,String category) {
 		totalRides.stream().forEach(n->{
-			fare = calculateTotalFare(n);
+			fare = calculateTotalFare(n,category);
 		});
-		return Math.round(fare*100.0)/100.0;
+		fare = Math.round(fare*100.0)/100.0;;
+		if (category.equals("normal")) {
+			if (fare< carAgency.normalMinimumFare) fare = carAgency.normalMinimumFare;
+		}
+		else {
+			if (fare< carAgency.premiumMinimumFare) fare = carAgency.premiumMinimumFare;
+		}
+		return fare;
 	}
 	
 	public Integer totalRidesCount(List<InvoiceData> totalRides) {
@@ -50,8 +63,8 @@ public class CalculateInvoice {
 		return arr;
 	}
 
-	public void invoiceReturn(List<InvoiceData> arr, Integer id) {
-		Double totFare = calculateMultipleRidesFare(arr);
+	public void invoiceReturn(List<InvoiceData> arr, Integer id,String category) {
+		Double totFare = calculateMultipleRidesFare(arr,category);
 		Double avgFare = avgRideFare(totFare,arr);
 		Integer totalCount = totalRidesCount(arr);
 		invoiceDetails.put(id, new InvoiceService(totFare, avgFare, totalCount,arr));

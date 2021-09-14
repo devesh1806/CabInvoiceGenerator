@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.cabinvoicegenerator.CalculateInvoice;
+import com.cabinvoicegenerator.CarAgency;
 import com.cabinvoicegenerator.InvoiceData;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import org.junit.FixMethodOrder;
 public class InvoiceTest {
 	
 	public CalculateInvoice calculateInvoice;
+	public CarAgency carAgency;
 	
 	@Test
 	public void addData_ForMultipleRides() {
@@ -30,16 +32,18 @@ public class InvoiceTest {
 	@Test
 	public void givenData_WhenCalculated_ShouldReturnTotalFare() {
 		calculateInvoice = new CalculateInvoice();
-		Double result = calculateInvoice.calculateTotalFare(new InvoiceData(25.0,12.0));
-		if (result<5.0) result = 5.0;
+		carAgency = new CarAgency();
+		Double result = calculateInvoice.calculateTotalFare(new InvoiceData(25.0,12.0),"normal");
+		if (result< carAgency.normalMinimumFare) result = carAgency.normalMinimumFare;
 		Assert.assertEquals((Double)262.0, result);
 	}
 	
 	@Test
 	public void givenLessDistanceData_WhenCalculated_ShouldReturnTotalFare() {
 		calculateInvoice = new CalculateInvoice();
-		Double result = calculateInvoice.calculateTotalFare(new InvoiceData(0.1,2.0));
-		if (result<5.0) result = 5.0;
+		carAgency = new CarAgency();
+		Double result = calculateInvoice.calculateTotalFare(new InvoiceData(0.1,2.0),"normal");
+		if (result< carAgency.normalMinimumFare) result = carAgency.normalMinimumFare;
 		Assert.assertEquals((Double)5.0, result);
 	}
 	
@@ -49,7 +53,7 @@ public class InvoiceTest {
 	public void givenMultipleData_WhenCalculated_ShouldReturnTotalFare() {
 		calculateInvoice = new CalculateInvoice();
 		List<InvoiceData> arr=calculateInvoice.getList();
-		Double result = calculateInvoice.calculateMultipleRidesFare(arr);
+		Double result = calculateInvoice.calculateMultipleRidesFare(arr,"normal");
 		Assert.assertEquals((Double)1218.9, result);
 	}
 	
@@ -57,8 +61,7 @@ public class InvoiceTest {
 	public void givenMultipleData_WhenCalculated_ShouldReturnTotalAverageFareAndTotalRides() {
 		calculateInvoice = new CalculateInvoice();
 		List<InvoiceData> arr=calculateInvoice.getList();
-		Double result = calculateInvoice.calculateMultipleRidesFare(arr);
-		if (result<5.0) result = 5.0;
+		Double result = calculateInvoice.calculateMultipleRidesFare(arr,"normal");
 		Integer resultCount = calculateInvoice.totalRidesCount(arr);
 		Double resultAvg = calculateInvoice.avgRideFare(result,arr);
 		Assert.assertEquals((Double)1218.9, result);
@@ -69,14 +72,33 @@ public class InvoiceTest {
 	@Test
 	public void givenDataWithId_WhenCalculated_ShouldReturnInvoice() {
 		calculateInvoice = new CalculateInvoice();
+		carAgency = new CarAgency();
 		List<InvoiceData> arr=calculateInvoice.addToListRidesService();
 		List<InvoiceData> arrSecond=calculateInvoice.getList();
-		calculateInvoice.invoiceReturn(arr,1);
-		calculateInvoice.invoiceReturn(arrSecond,2);
+		calculateInvoice.invoiceReturn(arr,1,"normal");
+		calculateInvoice.invoiceReturn(arrSecond,2,"normal");
 		String res = calculateInvoice.invoice(1);
 		String resSecond = calculateInvoice.invoice(2);
-		Assert.assertEquals("Total Fare = 875.0,\nAverage Fare = 291.67,\nTotal Rides = 3", res);
-		Assert.assertEquals("Total Fare = 2093.9,\nAverage Fare = 348.98,\nTotal Rides = 6", resSecond);
+		String resExpected = "Total Fare = 875.0,\nAverage Fare = 291.67,\nTotal Rides = 3";
+		String resSecondExpected = "Total Fare = 2093.9,\nAverage Fare = 348.98,\nTotal Rides = 6";
+		Assert.assertEquals(resExpected, res);
+		Assert.assertEquals(resSecondExpected, resSecond);
+	}
+	
+	@Test
+	public void givenDataWithId_WhenPremiumCalculated_ShouldReturnInvoice() {
+		calculateInvoice = new CalculateInvoice();
+		carAgency = new CarAgency();
+		List<InvoiceData> arr=calculateInvoice.addToListRidesService();
+		List<InvoiceData> arrSecond=calculateInvoice.getList();
+		calculateInvoice.invoiceReturn(arr,1,"premium");
+		calculateInvoice.invoiceReturn(arrSecond,2,"premium");
+		String res = calculateInvoice.invoice(1);
+		String resSecond = calculateInvoice.invoice(2);
+		String resExpected = "Total Fare = 1331.0,\nAverage Fare = 443.67,\nTotal Rides = 3";
+		String resSecondExpected = "Total Fare = 3195.85,\nAverage Fare = 532.64,\nTotal Rides = 6";
+		Assert.assertEquals(resExpected, res);
+		Assert.assertEquals(resSecondExpected, resSecond);
 	}
 	
 }
