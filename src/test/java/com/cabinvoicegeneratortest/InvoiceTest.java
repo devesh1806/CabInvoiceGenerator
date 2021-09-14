@@ -72,7 +72,6 @@ public class InvoiceTest {
 	@Test
 	public void givenDataWithId_WhenCalculated_ShouldReturnInvoice() {
 		calculateInvoice = new CalculateInvoice();
-		carAgency = new CarAgency();
 		List<InvoiceData> arr=calculateInvoice.addToListRidesService();
 		List<InvoiceData> arrSecond=calculateInvoice.getList();
 		calculateInvoice.invoiceReturn(arr,1,"normal");
@@ -88,7 +87,6 @@ public class InvoiceTest {
 	@Test
 	public void givenDataWithId_WhenPremiumCalculated_ShouldReturnInvoice() {
 		calculateInvoice = new CalculateInvoice();
-		carAgency = new CarAgency();
 		List<InvoiceData> arr=calculateInvoice.addToListRidesService();
 		List<InvoiceData> arrSecond=calculateInvoice.getList();
 		calculateInvoice.invoiceReturn(arr,1,"premium");
